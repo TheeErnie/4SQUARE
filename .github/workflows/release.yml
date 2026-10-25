@@ -1,0 +1,80 @@
+name: Build and release apps
+
+on:
+  pull_request:
+  release:
+    types:
+      - published
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: Build ${{ matrix.target }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: windows-latest
+            target: windows-x64
+          - os: macos-15
+            target: macos-arm64
+          - os: macos-15-intel
+            target: macos-x64
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install build dependency
+        run: python -m pip install -r requirements-build.txt
+
+      - name: Package Windows app
+        if: runner.os == 'Windows'
+        run: |
+          python -m PyInstaller --noconfirm --clean --onefile --windowed --name FourSquareTournament 4square.py
+          New-Item -ItemType Directory -Force release-assets | Out-Null
+          Compress-Archive -Path dist/FourSquareTournament.exe -DestinationPath release-assets/FourSquare-windows-x64.zip
+        shell: pwsh
+
+      - name: Package Mac app
+        if: runner.os == 'macOS'
+        run: |
+          python -m PyInstaller --noconfirm --clean --windowed --name FourSquareTournament 4square.py
+          mkdir -p release-assets
+          ditto -c -k --sequesterRsrc --keepParent dist/FourSquareTournament.app "release-assets/FourSquare-${{ matrix.target }}.zip"
+
+      - name: Upload packaged app
+        uses: actions/upload-artifact@v4
+        with:
+          name: FourSquare-${{ matrix.target }}
+          path: release-assets/*.zip
+          if-no-files-found: error
+
+  publish:
+    name: Publish GitHub release
+    if: github.event_name == 'release'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download packaged apps
+        uses: actions/download-artifact@v4
+        with:
+          pattern: FourSquare-*
+          path: release-assets
+          merge-multiple: true
+
+      - name: Publish release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          generate_release_notes: true
+          files: release-assets/*.zip
