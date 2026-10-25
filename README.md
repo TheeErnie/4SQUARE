@@ -20,6 +20,19 @@ Mac, Control-click the app, choose **Open**, and confirm. On Windows, only
 proceed past SmartScreen if you downloaded the app from this project's GitHub
 Releases page.
 
+## Publishing a release
+
+Pushing a version tag such as `v1.0.0` starts a GitHub Actions build for Windows,
+Apple silicon Macs, and Intel Macs. When all three builds finish, GitHub creates
+a release for that tag and attaches the downloadable ZIP files. Find the
+downloads on the repository's **Releases** page. To publish a version from the
+repository, run:
+
+```sh
+git tag v1.0.0
+git push origin v1.0.0
+```
+
 ## Quick start
 
 1. Add at least four players in starting order: King, Queen, Jack, First
