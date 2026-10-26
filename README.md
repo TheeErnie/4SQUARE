@@ -1,7 +1,8 @@
 # 4-Square Tournament
 
-A simple scorer for keeping a 4-square tournament moving. Add your players,
-record each round, and let the app track scores and the queue.
+This work includes all documentation and software necessary to host and run a 4-Square tournament. I thank Will T. and Kirby N. for their support in producing the formalized rule set and tournament structure. Executable downloads are available via the releases section, or it can be built natively through python. 
+
+The software allows you to add your tournament players, record each round, and let the app track scores and the queue without messy paperwork. Suggestions for improvement are welcome. 
 
 ## Download
 
@@ -42,3 +43,6 @@ Releases page.
   log...** to save a text copy.
 - **Standings** shows the current score ranking. **R** resets the tournament;
   **X** closes the app.
+
+## Rules & Tournament Structure
+See `Tournament-Rules/` for game rules and tournament structure that this app was designed to support.  
